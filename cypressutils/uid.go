@@ -1,7 +1,6 @@
 package cypressutils
 
 import (
-	"github.com/codecypress/go-ancillary-utils/securityutils"
 	"github.com/google/uuid"
 	cErrors "github.com/pkg/errors"
 	"strconv"
@@ -25,7 +24,7 @@ func GetCurrentUnixTimeStamp() string {
 }
 
 func GetScedarUUID() string {
-	return securityutils.SHA256(GetCurrentUnixTimeStamp() + salt + GetUUID())
+	return SHA256(GetCurrentUnixTimeStamp() + salt + GetUUID())
 }
 
 func GetAccessToken() string {

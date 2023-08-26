@@ -1,4 +1,4 @@
-package securityutils
+package cypressutils
 
 import (
 	"bytes"
