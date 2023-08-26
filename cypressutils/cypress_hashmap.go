@@ -3,7 +3,6 @@ package cypressutils
 import (
 	"bytes"
 	"fmt"
-	"github.com/codecypress/go-ancillary-utils/miscellaneous"
 	"strconv"
 	"strings"
 )
@@ -196,7 +195,7 @@ func (hashmap *CypressHashMap) PrintRecordTabular(exclude ...string) {
 			}
 
 			field = strings.ToUpper(field)
-			fmt.Printf("%-30s", miscellaneous.AbbreviateString(field, 30))
+			fmt.Printf("%-30s", AbbreviateString(field, 30))
 		}
 		fmt.Println()
 		for pair := hashmap.orderedMap.Oldest(); pair != nil; pair = pair.Next() {
@@ -214,7 +213,7 @@ func (hashmap *CypressHashMap) PrintRecordTabular(exclude ...string) {
 				}
 			}
 
-			fmt.Printf("%-30s", miscellaneous.AbbreviateString(value, 30))
+			fmt.Printf("%-30s", AbbreviateString(value, 30))
 		}
 		fmt.Println()
 		fmt.Println("\n*******************************")

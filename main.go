@@ -1,7 +1,9 @@
 package main
 
-import "github.com/codecypress/go-ancillary-utils/logging"
+import (
+	"github.com/codecypress/go-ancillary-utils/cypressutils"
+)
 
 func main() {
-	logging.Println("-------------------------------------------------")
+	cypressutils.Println("-------------------------------------------------")
 }

@@ -2,7 +2,6 @@ package cypressutils
 
 import (
 	"fmt"
-	"github.com/codecypress/go-ancillary-utils/miscellaneous"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -68,7 +67,7 @@ func (list *CypressArrayList) PrintRecordsTabular(fieldWidthMapSlice ...map[stri
 			}
 
 			field = strings.ToUpper(field)
-			fmt.Printf("%-"+strconv.Itoa(width)+"s", miscellaneous.AbbreviateString(field, width))
+			fmt.Printf("%-"+strconv.Itoa(width)+"s", AbbreviateString(field, width))
 		}
 
 		fmt.Println()
@@ -93,7 +92,7 @@ func (list *CypressArrayList) PrintRecordsTabular(fieldWidthMapSlice ...map[stri
 					}
 				}
 
-				fmt.Printf("%-"+strconv.Itoa(width)+"s", miscellaneous.AbbreviateString(value, width))
+				fmt.Printf("%-"+strconv.Itoa(width)+"s", AbbreviateString(value, width))
 			}
 			fmt.Println()
 		}

@@ -1,9 +1,6 @@
 package cypressutils
 
 import (
-	"github.com/codecypress/go-ancillary-utils/exceptions"
-	"github.com/codecypress/go-ancillary-utils/logging"
-	"github.com/codecypress/go-ancillary-utils/querymanager"
 	cErrors "github.com/pkg/errors"
 	"strings"
 )
@@ -156,7 +153,7 @@ func (wrapper *TransactionWrapper) SetMessages(messages []string) {
 
 func (wrapper *TransactionWrapper) DisplayQueriesExecuted() {
 	for _, query := range wrapper.QueryExecutedList {
-		logging.Println(querymanager.FormatSQL(query))
+		Println(FormatSQL(query))
 	}
 }
 
@@ -183,7 +180,7 @@ func (wrapper *TransactionWrapper) GetSingleRecord() (result *CypressHashMap, er
 		}
 	default:
 		err = cErrors.New("failed to call 'getSingleRecord()'. Can only be called if Data is of type CypressHashMap, CypressArrayList or PageableWrapper")
-		exceptions.ThrowException(err)
+		ThrowException(err)
 		return nil, err
 	}
 }

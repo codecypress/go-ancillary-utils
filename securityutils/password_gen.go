@@ -1,7 +1,7 @@
 package securityutils
 
 import (
-	"github.com/codecypress/go-ancillary-utils/miscellaneous"
+	"github.com/codecypress/go-ancillary-utils/cypressutils"
 )
 
 const const_LOWER = "abcdefghijklmnopqrstuvwxyz"
@@ -74,7 +74,7 @@ func (password *Passwords) Generate(size int) string {
 
 	randomChars := make([]uint8, size)
 	for i := 0; i < size; i++ {
-		randomChars[i] = allowableChars[miscellaneous.RandomNum(numberOfCodePoints)]
+		randomChars[i] = allowableChars[cypressutils.RandomNum(numberOfCodePoints)]
 	}
 	return string(randomChars)
 }
