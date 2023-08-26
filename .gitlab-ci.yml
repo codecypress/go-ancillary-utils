@@ -1,0 +1,34 @@
+variables:
+  # Please edit to your GitLab project
+  REPO_NAME: ke/co/skyworld/ancillary-utils
+  MODULE_NAME: ke/co/skyworld/ancillary-utils
+  CURR_DATETIME: $(date "+%Y%m%d%m%H%M%S")
+
+# The problem is that to be able to use go get, one needs to put
+# the repository in the $GOPATH. So for example if your gitlab domain
+# is gitlab.com, and that your repository is namespace/project, and
+# the default GOPATH being /go, then you'd need to have your
+# repository in /go/src/gitlab.com/namespace/project
+# Thus, making a symbolic link corrects this.
+before_script:
+  #- mkdir -p $GITLAB_GO_PACKAGES/$(dirname $REPO_NAME)
+  #- mkdir -p $GITLAB_GO_PACKAGES/$REPO_NAME
+  #- echo "The dir is $CI_PROJECT_DIR"
+  #- ln -svf $CI_PROJECT_DIR $GITLAB_GO_PACKAGES/$REPO_NAME
+  #- cd $GITLAB_GO_PACKAGES/$REPO_NAME
+  - cd $CI_PROJECT_DIR
+  #- echo $CI_PROJECT_DIR
+  #- ls $CI_PROJECT_DIR
+  #- echo "go build -race -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR"
+
+stages:
+  - build
+
+compile:
+  stage: build
+  script:
+    #- pwd
+    - go build -race -ldflags "-extldflags '-static'"
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR
