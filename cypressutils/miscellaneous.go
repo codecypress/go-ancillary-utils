@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
+	"fmt"
 	cErrors "github.com/pkg/errors"
 	"io/ioutil"
 	"jaytaylor.com/html2text"
@@ -148,4 +149,8 @@ func GetCallerFilename(filePath string) string {
 	} else {
 		return filePath[strings.LastIndex(filePath, "\\")+1:]
 	}
+}
+
+func ToString(data interface{}) string {
+	return fmt.Sprintf("%v", data)
 }

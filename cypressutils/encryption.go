@@ -175,3 +175,32 @@ func zeroUnPadding(origData []byte) []byte {
 			return r == rune(0)
 		})
 }
+
+type EncryptionInterface interface {
+	Encrypt(plaintext string) string
+	Decrypt(ciphertext string) string
+}
+
+var encInterface EncryptionInterface
+
+func EncryptionImplementation(theEncInterface EncryptionInterface) {
+	encInterface = theEncInterface
+}
+
+func Encrypt(plaintext string) string {
+	if encInterface == nil {
+		ThrowException(errors.New("encryption implementation not provided"))
+		return ""
+	}
+
+	return encInterface.Encrypt(plaintext)
+}
+
+func Decrypt(ciphertext string) string {
+	if encInterface == nil {
+		ThrowException(errors.New("encryption implementation not provided"))
+		return ""
+	}
+
+	return encInterface.Decrypt(ciphertext)
+}

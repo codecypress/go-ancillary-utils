@@ -36,8 +36,12 @@ func WriteToFile(strFilePath string, data interface{}) (err error) {
 		return
 	}
 
-	bytes := []byte(fmt.Sprintf("%v", data))
-	return ioutil.WriteFile(strFilePath, bytes, 0777)
+	if _, err := file.Write([]byte(fmt.Sprintf("%v", data))); err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func GetFileExtension(fileName string) string {
