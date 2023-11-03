@@ -30,7 +30,7 @@ func ReadFromFileToBytes(strFilePath string) ([]byte, error) {
 }
 
 func WriteToFile(strFilePath string, data interface{}) (err error) {
-	file, err := os.OpenFile(strFilePath, os.O_CREATE|os.O_WRONLY, 0777)
+	file, err := os.OpenFile(strFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0777)
 	defer file.Close()
 	if err != nil {
 		return
