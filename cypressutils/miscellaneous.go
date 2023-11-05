@@ -10,6 +10,7 @@ import (
 	"jaytaylor.com/html2text"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -24,9 +25,22 @@ func GetWorkingDir() (workingDir string) {
 	workingDir, err := os.Getwd()
 
 	if err != nil {
-		PanicError(err)
+		ThrowException(err)
+		return ""
 	}
 	return
+}
+
+func GetWorkingDirFromServiceExecutable() (workingDir string) {
+	fullexecpath, err := os.Executable()
+	if err != nil {
+		ThrowException(err)
+		return ""
+	}
+
+	dir, _ := filepath.Split(fullexecpath)
+
+	return dir
 }
 
 func PanicError(e error) {
