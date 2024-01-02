@@ -13,9 +13,10 @@ import (
 type DbTypes string
 
 const (
-	DB_TYPE_MSQL          DbTypes = "mysql"
-	DB_TYPE_MICROSOFT_SQL DbTypes = ""
-	DB_TYPE_POSTGRESQL    DbTypes = "postgres"
+	DbTypeMysql        DbTypes = "mysql"
+	DbTypeMicrosoftSql DbTypes = "sqlserver"
+	DbTypePostgresql   DbTypes = "postgres"
+	DbTypeOracle       DbTypes = "ora"
 )
 
 // ConDSN Data Source Name
@@ -24,6 +25,7 @@ type ConDSN struct {
 	databaseServer                                                     DbTypes
 	databaseName, databaseHost, userName, password, connectionMetadata string
 	port                                                               int
+	maxIdleConnections, maxOpenConnections                             int
 }
 
 type ConnectionsDSNs struct {
@@ -35,7 +37,7 @@ var connectionsDSNs *ConnectionsDSNs = &ConnectionsDSNs{
 }
 
 func SetupDSNs() {
-	databaseServer := DB_TYPE_POSTGRESQL
+	databaseServer := DbTypePostgresql
 	masterUserName, _ := ConfGetDBUserName()
 	masterPassword, _ := ConfGetDBPassword()
 	masterDatabaseName, _ := ConfGetDatabaseName()
@@ -85,6 +87,50 @@ func SetupDSNs() {
 	connectionsDSNs.conDSNs["-1L"] = masterConDSN
 
 	//TODO: FETCH CONNECTIONS AND POPULATE HERE
+}
+
+func SetupDSN(organizationId string, conDSN *ConDSN) error {
+
+	var masterDSNURL = ""
+
+	switch conDSN.databaseServer {
+	case DbTypePostgresql:
+		masterDSNURL = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			conDSN.databaseHost, conDSN.port, conDSN.userName, conDSN.password, conDSN.databaseName)
+	case DbTypeMicrosoftSql:
+		masterDSNURL = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s",
+			conDSN.databaseHost, conDSN.userName, conDSN.password, conDSN.port, conDSN.databaseName)
+	case DbTypeMysql:
+		masterDSNURL = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conDSN.userName, conDSN.password, conDSN.databaseHost, conDSN.port, conDSN.databaseName)
+	case DbTypeOracle:
+		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.userName, conDSN.password, conDSN.databaseHost, conDSN.port, conDSN.databaseName)
+	}
+
+	fmt.Println("\n ---------------------<", "database", ">---------------------")
+	fmt.Println("", PadStringToPrintInConsole(strings.ToUpper(conDSN.databaseName), 54, " "))
+	fmt.Println("", PadStringToPrintInConsole("------[ Creating connection pool... ]------", 54, " "))
+	fmt.Println(" Database Server   : ", conDSN.databaseServer)
+	fmt.Println(" Database Host : ", conDSN.databaseHost, conDSN.port)
+	//fmt.Println(" Connection URL:", masterDSNURLMasked)
+
+	masterDb, err := sql.Open(string(conDSN.databaseServer), masterDSNURL)
+	defer masterDb.Close()
+
+	if err != nil {
+		return err
+	}
+
+	err = masterDb.Ping()
+	if err != nil {
+		return err
+	}
+
+	//masterDb.SetConnMaxLifetime(time.Minute * 3)
+	masterDb.SetMaxIdleConns(conDSN.maxIdleConnections)
+	masterDb.SetMaxOpenConns(conDSN.maxOpenConnections)
+
+	connectionsDSNs.conDSNs[organizationId] = conDSN
+	return nil
 }
 
 func connectToDatabase(databaseType DbTypes, databaseName, databaseHost, userName, password, connectionMetadata string, port int) (*sql.DB, error) {
