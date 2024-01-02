@@ -114,14 +114,16 @@ func SetupDSN(organizationId string, conDSN *DBConDSN) error {
 	//fmt.Println(" Connection URL:", masterDSNURLMasked)
 
 	masterDb, err := sql.Open(string(conDSN.DatabaseServer), masterDSNURL)
-	defer masterDb.Close()
-
 	if err != nil {
+		ThrowException(err)
 		return err
 	}
 
+	defer masterDb.Close()
+
 	err = masterDb.Ping()
 	if err != nil {
+		ThrowException(err)
 		return err
 	}
 
