@@ -13,7 +13,7 @@ import (
 type DbTypes string
 
 const (
-	Mysql        DbTypes = "mysql"
+	MySQL        DbTypes = "mysql"
 	MicrosoftSQL DbTypes = "sqlserver"
 	PostgreSQL   DbTypes = "postgres"
 	Oracle       DbTypes = "ora"
@@ -95,16 +95,18 @@ func SetupDSN(organizationId string, conDSN *DBConDSN) error {
 
 	switch conDSN.DatabaseServer {
 	case PostgreSQL:
-		masterDSNURL = fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
+		masterDSNURL = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 			conDSN.DatabaseHost, conDSN.Port, conDSN.UserName, conDSN.Password, conDSN.DatabaseName)
 	case MicrosoftSQL:
 		masterDSNURL = fmt.Sprintf("server=%s;user id=%s;Password=%s;Port=%d;database=%s",
 			conDSN.DatabaseHost, conDSN.UserName, conDSN.Password, conDSN.Port, conDSN.DatabaseName)
-	case Mysql:
+	case MySQL:
 		masterDSNURL = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
 	case Oracle:
 		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
 	}
+
+	fmt.Println(masterDSNURL)
 
 	fmt.Println("\n ---------------------<", "database", ">---------------------")
 	fmt.Println("", PadStringToPrintInConsole(strings.ToUpper(conDSN.DatabaseName), 54, " "))
