@@ -13,10 +13,10 @@ import (
 type DbTypes string
 
 const (
-	DbTypeMysql        DbTypes = "mysql"
-	DbTypeMicrosoftSql DbTypes = "sqlserver"
-	DbTypePostgresql   DbTypes = "postgres"
-	DbTypeOracle       DbTypes = "ora"
+	Mysql        DbTypes = "mysql"
+	MicrosoftSQL DbTypes = "sqlserver"
+	PostgreSQL   DbTypes = "postgres"
+	Oracle       DbTypes = "ora"
 )
 
 // DBConDSN Data Source Name
@@ -37,7 +37,7 @@ var connectionsDSNs *ConnectionsDSNs = &ConnectionsDSNs{
 }
 
 func SetupDSNs() {
-	databaseServer := DbTypePostgresql
+	databaseServer := PostgreSQL
 	masterUserName, _ := ConfGetDBUserName()
 	masterPassword, _ := ConfGetDBPassword()
 	masterDatabaseName, _ := ConfGetDatabaseName()
@@ -94,15 +94,15 @@ func SetupDSN(organizationId string, conDSN *DBConDSN) error {
 	var masterDSNURL = ""
 
 	switch conDSN.DatabaseServer {
-	case DbTypePostgresql:
+	case PostgreSQL:
 		masterDSNURL = fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
 			conDSN.DatabaseHost, conDSN.Port, conDSN.UserName, conDSN.Password, conDSN.DatabaseName)
-	case DbTypeMicrosoftSql:
+	case MicrosoftSQL:
 		masterDSNURL = fmt.Sprintf("server=%s;user id=%s;Password=%s;Port=%d;database=%s",
 			conDSN.DatabaseHost, conDSN.UserName, conDSN.Password, conDSN.Port, conDSN.DatabaseName)
-	case DbTypeMysql:
+	case Mysql:
 		masterDSNURL = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
-	case DbTypeOracle:
+	case Oracle:
 		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
 	}
 

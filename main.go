@@ -8,7 +8,7 @@ import (
 func main() {
 	conDSN := &cypressutils.DBConDSN{
 		OrganizationId:       "-1L",
-		DatabaseServer:       cypressutils.DbTypePostgresql,
+		DatabaseServer:       cypressutils.PostgreSQL,
 		DatabaseName:         "sky_bc365proxy_db",
 		DatabaseHost:         "192.168.90.75",
 		UserName:             "root",
