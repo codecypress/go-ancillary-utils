@@ -19,21 +19,21 @@ const (
 	DbTypeOracle       DbTypes = "ora"
 )
 
-// ConDSN Data Source Name
-type ConDSN struct {
-	organizationId                                                     string
-	databaseServer                                                     DbTypes
-	databaseName, databaseHost, userName, password, connectionMetadata string
-	port                                                               int
-	maxIdleConnections, maxOpenConnections                             int
+// DBConDSN Data Source Name
+type DBConDSN struct {
+	OrganizationId                                                       string
+	DatabaseServer                                                       DbTypes
+	DatabaseName, DatabaseHost, UserName, Password, ConnectionParameters string
+	Port                                                                 int
+	MaxIdleConnections, MaxOpenConnections                               int
 }
 
 type ConnectionsDSNs struct {
-	conDSNs map[string]*ConDSN
+	conDSNs map[string]*DBConDSN
 }
 
 var connectionsDSNs *ConnectionsDSNs = &ConnectionsDSNs{
-	conDSNs: make(map[string]*ConDSN),
+	conDSNs: make(map[string]*DBConDSN),
 }
 
 func SetupDSNs() {
@@ -46,7 +46,7 @@ func SetupDSNs() {
 	maxIdleConns, _ := ConfSlingRingInitialPoolSize()
 	maxOpenConns, _ := ConfSlingRingMaxPoolSize()
 
-	masterDSNURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	masterDSNURL := fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
 		masterDatabaseHost, masterPort, masterUserName, masterPassword, masterDatabaseName)
 	//masterDSNURLMasked := masterUserName + ":***@tcp(" + masterDatabaseHost + ":" + strconv.Itoa(masterPort) + ")/" + masterDatabaseName
 
@@ -73,15 +73,15 @@ func SetupDSNs() {
 	masterDb.SetMaxIdleConns(maxIdleConns)
 	masterDb.SetMaxOpenConns(maxOpenConns)
 
-	masterConDSN := &ConDSN{
-		organizationId:     "-1L",
-		databaseServer:     databaseServer,
-		databaseName:       masterDatabaseName,
-		databaseHost:       masterDatabaseHost,
-		userName:           masterUserName,
-		password:           masterPassword,
-		connectionMetadata: "",
-		port:               masterPort,
+	masterConDSN := &DBConDSN{
+		OrganizationId:       "-1L",
+		DatabaseServer:       databaseServer,
+		DatabaseName:         masterDatabaseName,
+		DatabaseHost:         masterDatabaseHost,
+		UserName:             masterUserName,
+		Password:             masterPassword,
+		ConnectionParameters: "",
+		Port:                 masterPort,
 	}
 
 	connectionsDSNs.conDSNs["-1L"] = masterConDSN
@@ -89,31 +89,31 @@ func SetupDSNs() {
 	//TODO: FETCH CONNECTIONS AND POPULATE HERE
 }
 
-func SetupDSN(organizationId string, conDSN *ConDSN) error {
+func SetupDSN(organizationId string, conDSN *DBConDSN) error {
 
 	var masterDSNURL = ""
 
-	switch conDSN.databaseServer {
+	switch conDSN.DatabaseServer {
 	case DbTypePostgresql:
-		masterDSNURL = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-			conDSN.databaseHost, conDSN.port, conDSN.userName, conDSN.password, conDSN.databaseName)
+		masterDSNURL = fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
+			conDSN.DatabaseHost, conDSN.Port, conDSN.UserName, conDSN.Password, conDSN.DatabaseName)
 	case DbTypeMicrosoftSql:
-		masterDSNURL = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s",
-			conDSN.databaseHost, conDSN.userName, conDSN.password, conDSN.port, conDSN.databaseName)
+		masterDSNURL = fmt.Sprintf("server=%s;user id=%s;Password=%s;Port=%d;database=%s",
+			conDSN.DatabaseHost, conDSN.UserName, conDSN.Password, conDSN.Port, conDSN.DatabaseName)
 	case DbTypeMysql:
-		masterDSNURL = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conDSN.userName, conDSN.password, conDSN.databaseHost, conDSN.port, conDSN.databaseName)
+		masterDSNURL = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
 	case DbTypeOracle:
-		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.userName, conDSN.password, conDSN.databaseHost, conDSN.port, conDSN.databaseName)
+		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
 	}
 
 	fmt.Println("\n ---------------------<", "database", ">---------------------")
-	fmt.Println("", PadStringToPrintInConsole(strings.ToUpper(conDSN.databaseName), 54, " "))
+	fmt.Println("", PadStringToPrintInConsole(strings.ToUpper(conDSN.DatabaseName), 54, " "))
 	fmt.Println("", PadStringToPrintInConsole("------[ Creating connection pool... ]------", 54, " "))
-	fmt.Println(" Database Server   : ", conDSN.databaseServer)
-	fmt.Println(" Database Host : ", conDSN.databaseHost, conDSN.port)
+	fmt.Println(" Database Server   : ", conDSN.DatabaseServer)
+	fmt.Println(" Database Host : ", conDSN.DatabaseHost, conDSN.Port)
 	//fmt.Println(" Connection URL:", masterDSNURLMasked)
 
-	masterDb, err := sql.Open(string(conDSN.databaseServer), masterDSNURL)
+	masterDb, err := sql.Open(string(conDSN.DatabaseServer), masterDSNURL)
 	defer masterDb.Close()
 
 	if err != nil {
@@ -126,8 +126,8 @@ func SetupDSN(organizationId string, conDSN *ConDSN) error {
 	}
 
 	//masterDb.SetConnMaxLifetime(time.Minute * 3)
-	masterDb.SetMaxIdleConns(conDSN.maxIdleConnections)
-	masterDb.SetMaxOpenConns(conDSN.maxOpenConnections)
+	masterDb.SetMaxIdleConns(conDSN.MaxIdleConnections)
+	masterDb.SetMaxOpenConns(conDSN.MaxOpenConnections)
 
 	connectionsDSNs.conDSNs[organizationId] = conDSN
 	return nil
@@ -135,7 +135,7 @@ func SetupDSN(organizationId string, conDSN *ConDSN) error {
 
 func connectToDatabase(databaseType DbTypes, databaseName, databaseHost, userName, password, connectionMetadata string, port int) (*sql.DB, error) {
 
-	masterDSNURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	masterDSNURL := fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
 		databaseHost, port, userName, password, databaseName)
 
 	return sql.Open(string(databaseType), masterDSNURL)
@@ -151,21 +151,21 @@ func GetConnection(organizationId string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	databaseServer := conDSN.databaseServer
-	userName := conDSN.userName
-	password := conDSN.password
-	databaseName := conDSN.databaseName
-	databaseHost := conDSN.databaseHost
-	port := conDSN.port
-	//connectionMetadata := conDSN.connectionMetadata
+	databaseServer := conDSN.DatabaseServer
+	userName := conDSN.UserName
+	password := conDSN.Password
+	databaseName := conDSN.DatabaseName
+	databaseHost := conDSN.DatabaseHost
+	port := conDSN.Port
+	//ConnectionParameters := conDSN.ConnectionParameters
 
-	masterDSNURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	masterDSNURL := fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
 		databaseHost, port, userName, password, databaseName)
 
 	return sql.Open(string(databaseServer), masterDSNURL)
 }
 
-func GetConDSN(organizationId string) *ConDSN {
+func GetConDSN(organizationId string) *DBConDSN {
 	conDSN, exists := connectionsDSNs.conDSNs[organizationId]
 	if !exists {
 		err := cErrors.New("No Connection DSN Found where Organization Id = '" + organizationId + "'")
@@ -175,34 +175,34 @@ func GetConDSN(organizationId string) *ConDSN {
 	return conDSN
 }
 
-func (conDSN *ConDSN) GetOrganizationId() string {
-	return conDSN.organizationId
+func (conDSN *DBConDSN) GetOrganizationId() string {
+	return conDSN.OrganizationId
 }
 
-func (conDSN *ConDSN) GetDatabaseName() string {
-	return conDSN.databaseName
+func (conDSN *DBConDSN) GetDatabaseName() string {
+	return conDSN.DatabaseName
 }
 
-func (conDSN *ConDSN) GetDatabaseHost() string {
-	return conDSN.databaseHost
+func (conDSN *DBConDSN) GetDatabaseHost() string {
+	return conDSN.DatabaseHost
 }
 
-func (conDSN *ConDSN) GetUsername() string {
-	return conDSN.userName
+func (conDSN *DBConDSN) GetUsername() string {
+	return conDSN.UserName
 }
 
-func (conDSN *ConDSN) GetPassword() string {
-	return conDSN.password
+func (conDSN *DBConDSN) GetPassword() string {
+	return conDSN.Password
 }
 
-func (conDSN *ConDSN) GetConnectionMetadata() string {
-	return conDSN.connectionMetadata
+func (conDSN *DBConDSN) GetConnectionMetadata() string {
+	return conDSN.ConnectionParameters
 }
 
-func (conDSN *ConDSN) GetDatabaseServer() DbTypes {
-	return conDSN.databaseServer
+func (conDSN *DBConDSN) GetDatabaseServer() DbTypes {
+	return conDSN.DatabaseServer
 }
 
-func (conDSN *ConDSN) GetPort() int {
-	return conDSN.port
+func (conDSN *DBConDSN) GetPort() int {
+	return conDSN.Port
 }

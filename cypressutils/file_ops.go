@@ -42,7 +42,20 @@ func WriteToFile(strFilePath string, data interface{}) (err error) {
 	}
 
 	return nil
+}
 
+func WriteToFileNoAppend(strFilePath string, data interface{}) (err error) {
+	file, err := os.OpenFile(strFilePath, os.O_CREATE|os.O_WRONLY, 0777)
+	defer file.Close()
+	if err != nil {
+		return
+	}
+
+	if _, err := file.Write([]byte(fmt.Sprintf("%v", data))); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func GetFileExtension(fileName string) string {

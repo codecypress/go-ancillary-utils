@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"database/sql"
 	"errors"
-	"fmt"
 	cErrors "github.com/pkg/errors"
 	"strings"
 )
@@ -27,9 +26,9 @@ func txInsert(organizationId string, tx *sql.Tx, queryBuilder *QueryBuilder, que
 	namedParameter := NewNamedParameterQuery(tempQuery, queryArguments)
 
 	twrapper.AddQueryExecuted(tempQuery)
-	if showSql, _ := ConfShowSQL(); showSql {
+	/*if showSql, _ := ConfShowSQL(); showSql {
 		fmt.Println(FormatSQL(tempQuery))
-	}
+	}*/
 
 	parsedQuery := namedParameter.GetParsedQuery()
 	parsedParameters := namedParameter.GetParsedParameters()
@@ -143,9 +142,9 @@ func txBatchInsert(organizationId string, tx *sql.Tx, queryBuilder *QueryBuilder
 	tempQuery := queryBuilder.ToString()
 
 	twrapper.AddQueryExecuted(tempQuery)
-	if showSql, _ := ConfShowSQL(); showSql {
+	/*if showSql, _ := ConfShowSQL(); showSql {
 		fmt.Println(FormatSQL(tempQuery))
-	}
+	}*/
 
 	_, err = tx.Exec(tempQuery, parsedQueryParams...)
 	if err != nil {
@@ -382,9 +381,9 @@ func txRawQuery(organizationId string, tx *sql.Tx, query string, queryArguments 
 	validateQueryArguments(query, queryArguments)
 
 	twrapper.AddQueryExecuted(query)
-	if showSql, _ := ConfShowSQL(); showSql {
+	/*if showSql, _ := ConfShowSQL(); showSql {
 		fmt.Println(FormatSQL(query))
-	}
+	}*/
 
 	namedParameter := NewNamedParameterQuery(query, queryArguments)
 	parsedSelectQuery := namedParameter.GetParsedQuery()
@@ -409,9 +408,9 @@ func txSelectData(organizationId string, tx *sql.Tx, query string, queryArgument
 	validateQueryArguments(query, queryArguments)
 
 	twrapper.AddQueryExecuted(query)
-	if showSql, _ := ConfShowSQL(); showSql {
+	/*if showSql, _ := ConfShowSQL(); showSql {
 		fmt.Println(FormatSQL(query))
-	}
+	}*/
 
 	namedParameter := NewNamedParameterQuery(query, queryArguments)
 	parsedSelectQuery := namedParameter.GetParsedQuery()
@@ -506,9 +505,10 @@ func txUpdate(organizationId string, tx *sql.Tx, queryBuilder *QueryBuilder, que
 		return twrapper, err
 	}
 
-	if showSql, _ := ConfShowSQL(); showSql {
+	twrapper.AddQueryExecuted(queryBuilder.ToString())
+	/*if showSql, _ := ConfShowSQL(); showSql {
 		fmt.Println(FormatSQL(queryBuilder.ToString()))
-	}
+	}*/
 
 	namedParameter := NewNamedParameterQuery(queryBuilder.ToString(), queryArguments)
 	parsedSelectQuery := namedParameter.GetParsedQuery()
@@ -598,9 +598,10 @@ func txDelete(organizationId string, tx *sql.Tx, queryBuilder *QueryBuilder, que
 		return twrapper, err
 	}
 
-	if showSql, _ := ConfShowSQL(); showSql {
+	twrapper.AddQueryExecuted(queryBuilder.ToString())
+	/*if showSql, _ := ConfShowSQL(); showSql {
 		fmt.Println(FormatSQL(queryBuilder.ToString()))
-	}
+	}*/
 
 	namedParameter := NewNamedParameterQuery(queryBuilder.ToString()+" RETURNING *", queryArguments)
 	parsedSelectQuery := namedParameter.GetParsedQuery()
