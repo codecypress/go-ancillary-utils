@@ -106,8 +106,6 @@ func SetupDSN(organizationId string, conDSN *DBConDSN) error {
 		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
 	}
 
-	fmt.Println(masterDSNURL)
-
 	fmt.Println("\n ---------------------<", "database", ">---------------------")
 	fmt.Println("", PadStringToPrintInConsole(strings.ToUpper(conDSN.DatabaseName), 54, " "))
 	fmt.Println("", PadStringToPrintInConsole("------[ Creating connection pool... ]------", 54, " "))
@@ -155,18 +153,22 @@ func GetConnection(organizationId string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	databaseServer := conDSN.DatabaseServer
-	userName := conDSN.UserName
-	password := conDSN.Password
-	databaseName := conDSN.DatabaseName
-	databaseHost := conDSN.DatabaseHost
-	port := conDSN.Port
-	//ConnectionParameters := conDSN.ConnectionParameters
+	var masterDSNURL = ""
 
-	masterDSNURL := fmt.Sprintf("host=%s Port=%d user=%s Password=%s dbname=%s sslmode=disable",
-		databaseHost, port, userName, password, databaseName)
+	switch conDSN.DatabaseServer {
+	case PostgreSQL:
+		masterDSNURL = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			conDSN.DatabaseHost, conDSN.Port, conDSN.UserName, conDSN.Password, conDSN.DatabaseName)
+	case MicrosoftSQL:
+		masterDSNURL = fmt.Sprintf("server=%s;user id=%s;Password=%s;Port=%d;database=%s",
+			conDSN.DatabaseHost, conDSN.UserName, conDSN.Password, conDSN.Port, conDSN.DatabaseName)
+	case MySQL:
+		masterDSNURL = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
+	case Oracle:
+		masterDSNURL = fmt.Sprintf("%s/%s@//%s:%d/%s", conDSN.UserName, conDSN.Password, conDSN.DatabaseHost, conDSN.Port, conDSN.DatabaseName)
+	}
 
-	return sql.Open(string(databaseServer), masterDSNURL)
+	return sql.Open(string(conDSN.DatabaseServer), masterDSNURL)
 }
 
 func GetConDSN(organizationId string) *DBConDSN {
