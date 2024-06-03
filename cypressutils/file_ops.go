@@ -241,3 +241,31 @@ func ReadPropertiesFile(filename string) (AppConfigProperties, error) {
 
 	return config, nil
 }
+
+func fileSizeHumanReadable(size int64) string {
+	const (
+		_          = iota // ignore first value by assigning to blank identifier
+		KB float64 = 1 << (10 * iota)
+		MB
+		GB
+		TB
+		PB
+		EB
+	)
+	switch {
+	case float64(size) < KB:
+		return fmt.Sprintf("%d bytes", size)
+	case float64(size) < MB:
+		return fmt.Sprintf("%.2f KB", float64(size)/KB)
+	case float64(size) < GB:
+		return fmt.Sprintf("%.2f MB", float64(size)/MB)
+	case float64(size) < TB:
+		return fmt.Sprintf("%.2f GB", float64(size)/GB)
+	case float64(size) < PB:
+		return fmt.Sprintf("%.2f TB", float64(size)/TB)
+	case float64(size) < EB:
+		return fmt.Sprintf("%.2f PB", float64(size)/PB)
+	default:
+		return fmt.Sprintf("%.2f EB", float64(size)/EB)
+	}
+}
