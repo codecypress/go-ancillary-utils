@@ -5,9 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
-	cErrors "github.com/pkg/errors"
 	"io/ioutil"
-	"jaytaylor.com/html2text"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -15,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	cErrors "github.com/pkg/errors"
 )
 
 func init() {
@@ -148,14 +148,14 @@ func ImageToBase64(imagePath string) (string, error) {
 	return base64.StdEncoding.EncodeToString(byteArr), nil
 }
 
-func Html2Text(html string) string {
+/*func Html2Text(html string) string {
 	text, err := html2text.FromString(html, html2text.Options{PrettyTables: true})
 	if err != nil {
 		ThrowException(cErrors.Cause(err))
 		return html
 	}
 	return text
-}
+}*/
 
 func GetCallerFilename(filePath string) string {
 	if strings.Contains(filePath, "/") {
